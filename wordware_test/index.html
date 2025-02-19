@@ -15,7 +15,7 @@
 
       async function main() {
         const outputElement = document.getElementById("output");
-        outputElement.textContent = "Running app...\\n";
+        outputElement.textContent = "Running app...";
 
         try {
           const r = await fetch(
@@ -24,16 +24,12 @@
               method: "POST",
               body: JSON.stringify({
                 inputs: {
-                  topic: "Sugary cereal",
-                  image: {
-                    type: "image",
-                    image_url: "https://i.insider.com/602ee9ced3ad27001837f2ac",
-                  },
+                  text: "Sugary cereal"
                 },
-                version: "^1.0",
+                version: "^2.0",
               }),
               headers: {
-                Authorization: \'Bearer \${API_KEY}\',
+                Authorization: 'Bearer ${API_KEY}',
                 "Content-Type": "application/json"
               },
             }
@@ -42,8 +38,8 @@
           if (!r.ok) {
             const errorMsg = await r.json();
             outputElement.textContent +=
-              "\\nRun failed: " + JSON.stringify(errorMsg, null, 2);
-            throw Error('Run failed \${r.status}');
+              "Run failed: " + JSON.stringify(errorMsg, null, 2);
+            throw Error('Run failed ${r.status}');
           }
 
           const reader = r.body.getReader();
@@ -59,7 +55,7 @@
 
               const chunk = decoder.decode(value);
               for (let i = 0, len = chunk.length; i < len; ++i) {
-                const isChunkSeparator = chunk[i] === "\\n";
+                const isChunkSeparator = chunk[i] === "";
                 if (!isChunkSeparator) {
                   buffer.push(chunk[i]);
                   continue;
@@ -74,16 +70,16 @@
 
                 if (val.type === "generation") {
                   if (val.state === "start") {
-                    outputElement.textContent += `\\nNEW GENERATION - ${val.label}\\n`;
+                    outputElement.textContent += 'NEW GENERATION - ${val.label}';
                   } else {
-                    outputElement.textContent += `\\nEND GENERATION - ${val.label}\\n`;
+                    outputElement.textContent += 'END GENERATION - ${val.label}';
                   }
                 } else if (val.type === "chunk") {
                   outputElement.textContent += val.value ?? "";
                 } else if (val.type === "outputs") {
                   // Final outputs
                   outputElement.textContent +=
-                    "\\n\\nOutputs:\\n" + JSON.stringify(val, null, 2);
+                    "Outputs:" + JSON.stringify(val, null, 2);
                 }
               }
             }
@@ -92,7 +88,7 @@
           }
         } catch (err) {
           console.error(err);
-          document.getElementById("output").textContent += "\\nError: " + err.message;
+          document.getElementById("output").textContent += "Error: " + err.message;
         }
       }
 
